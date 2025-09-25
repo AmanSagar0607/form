@@ -6,7 +6,7 @@ export interface Resources {
 export interface LocationNode {
   id: string;
   name: string;
-  type: 'country' | 'state' | 'city' | 'district' | 'block' | 'grampanchayat';
+  type: 'country' | 'state' | 'city' | 'district' | 'block';
   parentId: string | null;
   resources: Resources;
   isExpanded?: boolean;
@@ -46,8 +46,7 @@ function getTransferRestrictions(type: string): string[] {
     state: ['country'],
     city: ['state'],
     district: ['city'],
-    block: ['district'],
-    grampanchayat: ['block']
+    block: ['district']
   };
   
   return restrictions[type] || [];

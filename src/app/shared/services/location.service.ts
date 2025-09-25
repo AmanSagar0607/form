@@ -17,19 +17,6 @@ export class LocationService {
   private initializeSampleData() {
     console.log('Initializing sample data...');
     
-    // Helper function to create gram panchayats for a block
-    const createGramPanchayats = (blockId: string, blockNum: number, multiplier: number): LocationNode[] => {
-      return Array.from({ length: 3 }, (_, i) => 
-        createLocationNode(
-          `gp${blockId}-${i + 1}`,
-          `Gram Panchayat ${i + 1}`,
-          'grampanchayat',
-          blockId,
-          { food: 10 * (i + 1) * multiplier }
-        )
-      );
-    };
-
     // Helper function to create blocks for a district
     const createBlocks = (districtId: string, districtNum: number, multiplier: number): LocationNode[] => {
       return Array.from({ length: 2 }, (_, i) => {
@@ -41,7 +28,7 @@ export class LocationService {
           'block',
           districtId,
           { food: 20 * blockNum * multiplier },
-          createGramPanchayats(blockId, blockNum, multiplier)
+          []
         );
       });
     };

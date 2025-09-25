@@ -56,7 +56,7 @@ export interface TransferRequestForm {
       [isVisible]="showTransferModal"
       [locations]="locations"
       (close)="showTransferModal=false"
-      (submit)="handleTransferSubmit($event)">
+      (transferSubmit)="handleTransferSubmit($event)">
     </app-transfer-request>
 
     <!-- Main Application Content -->
@@ -274,10 +274,10 @@ export class AppComponent implements OnInit, OnDestroy {
       console.error('Source node not found for id:', form.sourceId);
       return;
     }
-    const targetCountryId = form.targetIds?.[0];
-    const target = this.locations.find(n => n.id === targetCountryId) || null;
+    const targetId = form.targetIds?.[0];
+    const target = this.findNodeById(this.locations, targetId || undefined);
     if (!target) {
-      console.error('Target country not found for id:', targetCountryId);
+      console.error('Target node not found for id:', targetId);
       return;
     }
 
@@ -286,7 +286,9 @@ export class AppComponent implements OnInit, OnDestroy {
       target: `${target.name} (${target.type})`,
       reason: form.reason,
       includeFood: form.includeFood,
-      code: form.code
+      'Source TF Code': form.sourceTfCode,
+      'Target TF Code': form.targetTfCode,
+      'TF Code': form.code
     });
 
     this.transferService.requestTransfer(

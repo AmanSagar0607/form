@@ -18,10 +18,9 @@ import { NotificationService } from '../../services/notification.service';
           class="flex items-start p-2 rounded hover:bg-gray-50 transition-colors cursor-pointer" 
           (click)="onNodeClick(node)">
           
-          <!-- Toggle button - Show for all nodes except grampanchayat -->
+          <!-- Toggle button -->
           <div class="flex items-center">
             <div 
-              *ngIf="node.type !== 'grampanchayat'"
               class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-gray-700 mr-2 cursor-pointer"
               (click)="toggleNode(node); $event.stopPropagation()">
               <i-lucide 
@@ -31,9 +30,6 @@ import { NotificationService } from '../../services/notification.service';
                 (click)="toggleNode(node); $event.stopPropagation()">
               </i-lucide>
               <span *ngIf="!shouldLoadChildren(node) && !node.children?.length" class="w-4"></span>
-            </div>
-            <div *ngIf="node.type === 'grampanchayat'" class="w-5 mr-2">
-              <!-- Empty space to maintain alignment -->
             </div>
           </div>
           
@@ -124,7 +120,7 @@ export class LocationTreeComponent {
 
   shouldLoadChildren(node: LocationNode): boolean {
     // Only load children for these node types
-    return ['country', 'state', 'city', 'district', 'block'].includes(node.type);
+    return ['country', 'state', 'city', 'district'].includes(node.type);
   }
 
   getChildType(type: string): string {
@@ -133,7 +129,6 @@ export class LocationTreeComponent {
       case 'state': return 'cities';
       case 'city': return 'districts';
       case 'district': return 'blocks';
-      case 'block': return 'GPs';
       default: return 'items';
     }
   }
@@ -161,10 +156,7 @@ export class LocationTreeComponent {
             this.loadBlocksForDistrict(node);
             childType = 'blocks';
             break;
-          case 'block':
-            this.loadGramPanchayatsForBlock(node);
-            childType = 'gram panchayats';
-            break;
+          // 'block' has no children
         }
         
         // Show success notification
@@ -244,7 +236,7 @@ export class LocationTreeComponent {
   }
 
   private loadBlocksForDistrict(district: LocationNode): void {
-    // Create blocks with their gram panchayats
+    // Create blocks (no deeper levels)
     const blocks = Array.from({ length: 2 }, (_, i) => ({
       id: `b${district.id}-${i + 1}`,
       name: `Block ${i + 1}`,
@@ -260,22 +252,7 @@ export class LocationTreeComponent {
     this.triggerChangeDetection();
   }
 
-  private loadGramPanchayatsForBlock(block: LocationNode): void {
-    // Create gram panchayats
-    const gramPanchayats = Array.from({ length: 3 }, (_, i) => ({
-      id: `g${block.id}-${i + 1}`,
-      name: `Gram Panchayat ${i + 1}`,
-      type: 'grampanchayat' as const,
-      parentId: block.id,
-      resources: { food: 10 * (i + 1) },
-      isExpanded: false,
-      children: []
-    }));
-
-    // Add gram panchayats as children of the block
-    block.children = gramPanchayats;
-    this.triggerChangeDetection();
-  }
+  // Removed Gram Panchayat level
 
   private triggerChangeDetection(): void {
     this.nodes = [...this.nodes];
@@ -295,8 +272,7 @@ export class LocationTreeComponent {
       'state': 3,     // cities
       'city': 2,      // districts
       'district': 2,  // blocks
-      'block': 3,     // gram panchayats
-      'grampanchayat': 0
+      'block': 0
     };
     return defaultCounts[node.type] || 0;
   }
